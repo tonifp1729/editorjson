@@ -1,0 +1,25 @@
+<div class="container">
+    <h1>Nuevo JSON</h1>
+    <div class="form-group">
+        <label for="titulo">Título:</label>
+        <input type="text" id="titulo" name="titulo" required>
+    </div>
+    <div class="form-group">
+        <label for="curso">Curso:</label>
+        <select id="curso" name="curso" required>
+            <option value="">Selecciona un curso</option>
+            <option value="1DAW">1DAW</option>
+            <option value="2DAW">2DAW</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Modo:</label>
+        <label for="entrenamiento">
+            <input type="radio" id="entrenamiento" name="modo" value="entrenamiento" required> Entrenamiento
+        </label>
+        <label for="examen">
+            <input type="radio" id="examen" name="modo" value="examen" required> Examen
+        </label>
+    </div>
+    <button>Generar</button>
+</div>
