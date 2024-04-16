@@ -20,76 +20,82 @@ export class Editor extends Vista {
         }
     }
 
-    // Generamos el formulario dinámicamente según el JSON proporcionado
-    generarFormulario(jsonObtenido) {
-        // Obtener el contenedor principal
-        const container = document.createElement('div');
-        container.classList.add('container');
+// Generamos el formulario dinámicamente según el JSON proporcionado
+generarFormulario(jsonObtenido) {
+    // Obtener el contenedor principal
+    const container = document.createElement('div');
+    container.classList.add('container');
 
-        // Crear el título h1
-        const titulo = document.createElement('h1');
-        titulo.textContent = 'Nuevo JSON';
-        container.appendChild(titulo);
+    // Crear el título h1
+    const titulo = document.createElement('h1');
+    titulo.textContent = 'Nuevo JSON';
+    container.appendChild(titulo);
 
-        // Iterar sobre los campos del JSON y crear los elementos del formulario
-        jsonObtenido.campos.forEach((campo) => {
-            const formGroup = document.createElement('div');
-            formGroup.classList.add('form-group');
+    // Iterar sobre los campos del JSON y crear los elementos del formulario
+    jsonObtenido.campos.forEach((campo) => {
+        const formGroup = document.createElement('div');
+        formGroup.classList.add('form-group');
 
-            const label = document.createElement('label');
-            label.textContent = campo.nombre + ':';
+        const label = document.createElement('label');
+        label.textContent = campo.nombre + ':';
 
-            // Según el tipo de campo, creamos el elemento correspondiente
-            let inputElement;
-            if (campo.tipo === 'texto') {
-                inputElement = document.createElement('input');
-                inputElement.setAttribute('type', 'text');
-            } else if (campo.tipo === 'selección') {
-                inputElement = document.createElement('select');
-                campo.valores.forEach((valor) => {
-                    const option = document.createElement('option');
-                    option.setAttribute('value', valor);
-                    option.textContent = valor;
-                    inputElement.appendChild(option);
-                });
-            } else if (campo.tipo === 'opciones') {
-                campo.valores.forEach((valor) => {
-                    const labelOption = document.createElement('label');
-                    const inputOption = document.createElement('input');
-                    inputOption.setAttribute('type', 'radio');
-                    inputOption.setAttribute('name', campo.nombre.toLowerCase());
-                    inputOption.setAttribute('value', valor);
-                    labelOption.appendChild(inputOption);
-                    labelOption.appendChild(document.createTextNode(' ' + valor));
-                    formGroup.appendChild(labelOption);
-                });
-            }
+        // Según el tipo de campo, creamos el elemento correspondiente
+        let inputElement;
+        if (campo.tipo === 'texto') {
+            inputElement = document.createElement('input');
+            inputElement.setAttribute('type', 'text');
+        } else if (campo.tipo === 'selección') {
+            inputElement = document.createElement('select');
+            campo.valores.forEach((valor) => {
+                const option = document.createElement('option');
+                option.setAttribute('value', valor);
+                option.textContent = valor;
+                inputElement.appendChild(option);
+            });
+        } else if (campo.tipo === 'opciones') {
+            const fieldLabel = document.createElement('label'); // Agregar label para el campo "Modo"
+            fieldLabel.textContent = campo.nombre + ':'; // Añadir nombre del campo
+            container.appendChild(fieldLabel); // Agregar label al contenedor principal
 
-            // Agregar elementos al formulario
-            if (campo.tipo !== 'opciones') {
-                inputElement.setAttribute('id', campo.nombre.toLowerCase());
-                inputElement.setAttribute('name', campo.nombre.toLowerCase());
-                if (campo.tipo !== 'selección') {
-                    inputElement.setAttribute('required', '');
-                }
-                formGroup.appendChild(label);
-                formGroup.appendChild(inputElement);
-                container.appendChild(formGroup);
-            }
-        });
+            campo.valores.forEach((valor) => {
+                const labelOption = document.createElement('label');
+                const inputOption = document.createElement('input');
+                inputOption.setAttribute('type', 'radio');
+                inputOption.setAttribute('name', campo.nombre.toLowerCase());
+                inputOption.setAttribute('value', valor);
+                labelOption.appendChild(inputOption);
+                labelOption.appendChild(document.createTextNode(' ' + valor));
+                formGroup.appendChild(labelOption);
+            });
+            // No olvides agregar el formGroup al contenedor principal si el campo es de tipo "opciones"
+            container.appendChild(formGroup);
+            return; // Terminar la iteración aquí para evitar agregar el campo dos veces
+        }
 
-        // Crear el botón "Generar"
-        const buttonGenerar = document.createElement('button');
-        buttonGenerar.textContent = 'Generar';
-        buttonGenerar.addEventListener('click', () => {
-            // Llama a la función botongenerar cuando se hace clic en el botón
-            this.botongenerar('formulario.json', this.obtenerDatosFormulario());
-        });
-        container.appendChild(buttonGenerar);
+        // Agregar elementos al formulario
+        inputElement.setAttribute('id', campo.nombre.toLowerCase());
+        inputElement.setAttribute('name', campo.nombre.toLowerCase());
+        if (campo.tipo !== 'selección') {
+            inputElement.setAttribute('required', '');
+        }
+        formGroup.appendChild(label);
+        formGroup.appendChild(inputElement);
+        container.appendChild(formGroup);
+    });
 
-        // Agregar el contenedor al cuerpo del documento
-        document.body.appendChild(container);
-    }
+    // Crear el botón "Generar"
+    const buttonGenerar = document.createElement('button');
+    buttonGenerar.textContent = 'Generar';
+    buttonGenerar.addEventListener('click', () => {
+        // Llama a la función botongenerar cuando se hace clic en el botón
+        this.botongenerar('formulario.json', this.obtenerDatosFormulario());
+    });
+    container.appendChild(buttonGenerar);
+
+    // Agregar el contenedor al cuerpo del documento
+    document.body.appendChild(container);
+}
+
 
     // Obtener los datos del formulario y devolverlos como un objeto JSON
     obtenerDatosFormulario() {
