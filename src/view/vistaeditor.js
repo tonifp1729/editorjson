@@ -20,7 +20,7 @@ export class Editor extends Vista {
         }
     }
 
-    //Generamos el formulario
+    // Generamos el formulario dinámicamente según el JSON proporcionado
     generarFormulario(jsonObtenido) {
         // Obtener el contenedor principal
         const container = document.createElement('div');
@@ -31,91 +31,83 @@ export class Editor extends Vista {
         titulo.textContent = 'Nuevo JSON';
         container.appendChild(titulo);
 
-        // Crear el primer grupo de formulario para el título
-        const formGroupTitulo = document.createElement('div');
-        formGroupTitulo.classList.add('form-group');
-        const labelTitulo = document.createElement('label');
-        labelTitulo.setAttribute('for', 'titulo');
-        labelTitulo.textContent = 'Título:';
-        const inputTitulo = document.createElement('input');
-        inputTitulo.setAttribute('type', 'text');
-        inputTitulo.setAttribute('id', 'titulo');
-        inputTitulo.setAttribute('name', 'titulo');
-        inputTitulo.setAttribute('required', '');
-        formGroupTitulo.appendChild(labelTitulo);
-        formGroupTitulo.appendChild(inputTitulo);
-        container.appendChild(formGroupTitulo);
+        // Iterar sobre los campos del JSON y crear los elementos del formulario
+        jsonObtenido.campos.forEach((campo) => {
+            const formGroup = document.createElement('div');
+            formGroup.classList.add('form-group');
 
-        // Crear el segundo grupo de formulario para el curso
-        const formGroupCurso = document.createElement('div');
-        formGroupCurso.classList.add('form-group');
-        const labelCurso = document.createElement('label');
-        labelCurso.setAttribute('for', 'curso');
-        labelCurso.textContent = 'Curso:';
-        const selectCurso = document.createElement('select');
-        selectCurso.setAttribute('id', 'curso');
-        selectCurso.setAttribute('name', 'curso');
-        selectCurso.setAttribute('required', '');
-        const optionCursoDefault = document.createElement('option');
-        optionCursoDefault.setAttribute('value', '');
-        optionCursoDefault.textContent = 'Selecciona un curso';
-        const option1DAW = document.createElement('option');
-        option1DAW.setAttribute('value', '1DAW');
-        option1DAW.textContent = '1DAW';
-        const option2DAW = document.createElement('option');
-        option2DAW.setAttribute('value', '2DAW');
-        option2DAW.textContent = '2DAW';
-        selectCurso.appendChild(optionCursoDefault);
-        selectCurso.appendChild(option1DAW);
-        selectCurso.appendChild(option2DAW);
-        formGroupCurso.appendChild(labelCurso);
-        formGroupCurso.appendChild(selectCurso);
-        container.appendChild(formGroupCurso);
+            const label = document.createElement('label');
+            label.textContent = campo.nombre + ':';
 
-        // Crear el tercer grupo de formulario para el modo
-        const formGroupModo = document.createElement('div');
-        formGroupModo.classList.add('form-group');
-        const labelModo = document.createElement('label');
-        labelModo.textContent = 'Modo:';
-        const labelEntrenamiento = document.createElement('label');
-        const inputEntrenamiento = document.createElement('input');
-        inputEntrenamiento.setAttribute('type', 'radio');
-        inputEntrenamiento.setAttribute('id', 'entrenamiento');
-        inputEntrenamiento.setAttribute('name', 'modo');
-        inputEntrenamiento.setAttribute('value', 'entrenamiento');
-        inputEntrenamiento.setAttribute('required', '');
-        labelEntrenamiento.appendChild(inputEntrenamiento);
-        labelEntrenamiento.appendChild(document.createTextNode(' Entrenamiento'));
-        const labelExamen = document.createElement('label');
-        const inputExamen = document.createElement('input');
-        inputExamen.setAttribute('type', 'radio');
-        inputExamen.setAttribute('id', 'examen');
-        inputExamen.setAttribute('name', 'modo');
-        inputExamen.setAttribute('value', 'examen');
-        inputExamen.setAttribute('required', '');
-        labelExamen.appendChild(inputExamen);
-        labelExamen.appendChild(document.createTextNode(' Examen'));
-        formGroupModo.appendChild(labelModo);
-        formGroupModo.appendChild(labelEntrenamiento);
-        formGroupModo.appendChild(labelExamen);
-        container.appendChild(formGroupModo);
+            // Según el tipo de campo, creamos el elemento correspondiente
+            let inputElement;
+            if (campo.tipo === 'texto') {
+                inputElement = document.createElement('input');
+                inputElement.setAttribute('type', 'text');
+            } else if (campo.tipo === 'selección') {
+                inputElement = document.createElement('select');
+                campo.valores.forEach((valor) => {
+                    const option = document.createElement('option');
+                    option.setAttribute('value', valor);
+                    option.textContent = valor;
+                    inputElement.appendChild(option);
+                });
+            } else if (campo.tipo === 'opciones') {
+                campo.valores.forEach((valor) => {
+                    const labelOption = document.createElement('label');
+                    const inputOption = document.createElement('input');
+                    inputOption.setAttribute('type', 'radio');
+                    inputOption.setAttribute('name', campo.nombre.toLowerCase());
+                    inputOption.setAttribute('value', valor);
+                    labelOption.appendChild(inputOption);
+                    labelOption.appendChild(document.createTextNode(' ' + valor));
+                    formGroup.appendChild(labelOption);
+                });
+            }
+
+            // Agregar elementos al formulario
+            if (campo.tipo !== 'opciones') {
+                inputElement.setAttribute('id', campo.nombre.toLowerCase());
+                inputElement.setAttribute('name', campo.nombre.toLowerCase());
+                if (campo.tipo !== 'selección') {
+                    inputElement.setAttribute('required', '');
+                }
+                formGroup.appendChild(label);
+                formGroup.appendChild(inputElement);
+                container.appendChild(formGroup);
+            }
+        });
 
         // Crear el botón "Generar"
         const buttonGenerar = document.createElement('button');
         buttonGenerar.textContent = 'Generar';
+        buttonGenerar.addEventListener('click', () => {
+            // Llama a la función botongenerar cuando se hace clic en el botón
+            this.botongenerar('formulario.json', this.obtenerDatosFormulario());
+        });
         container.appendChild(buttonGenerar);
 
         // Agregar el contenedor al cuerpo del documento
         document.body.appendChild(container);
     }
 
-    // botongenerar(nombreFichero, texto) {
-    //     const a = document.createElement('a')
-    //     a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(texto))
-    //     a.setAttribute('download', nombreFichero)
-    //     a.style.display = 'none';
-    //     document.body.appendChild(a)
-    //     a.click()
-    //     document.body.removeChild(a)
-    // }
+    // Obtener los datos del formulario y devolverlos como un objeto JSON
+    obtenerDatosFormulario() {
+        const formData = {};
+        const formElements = document.querySelectorAll('input, select');
+        formElements.forEach((element) => {
+            formData[element.name] = element.value;
+        });
+        return JSON.stringify(formData, null, 2);
+    }
+
+    botongenerar(nombreFichero, texto) {
+        const a = document.createElement('a')
+        a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(texto))
+        a.setAttribute('download', nombreFichero)
+        a.style.display = 'none';
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+    }
 }

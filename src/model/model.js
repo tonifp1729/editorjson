@@ -6,8 +6,8 @@ export class Modelo {
     //Devolvemos el JSON
     getJSON() {
         return {"campos":[ 
-            { "nombre":"Título", "tipo":"texto" },
-            { "nombre":"Curso", "tipo":"selección", "valores":[ "1DAW", "2DAW" ] },
+            { "nombre":"Curso", "tipo":"selección", "valores":[ "--SELECCIONAR", "1DAW", "2DAW" ] },
+            { "nombre":"Otra Cosa", "tipo":"texto" },
             { "nombre":"Modo", "tipo":"opciones", "valores":[ "entranamiento", "examen" ] }
         ]}
     }
