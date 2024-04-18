@@ -10,7 +10,7 @@ export class Editor extends Vista {
         const modelo = new Modelo(); // Pasa el JSON al modelo
 
         //Obtenemos el JSON utilizando el método getJSON() presente en el modelo
-        const jsonObtenido = modelo.getJSON();
+        const jsonObtenido = modelo.getCabecera();
 
         //Llamamos al método de la vista para generar el formulario dinámicamente
         if (jsonObtenido) { // Verifica que jsonObtenido esté definido
