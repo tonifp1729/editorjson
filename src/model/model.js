@@ -9,7 +9,7 @@ export class Modelo {
             { "nombre":"Título", "tipo":"texto" },
             { "nombre":"Curso", "tipo":"selección", "valores":[ "--SELECCIONAR", "1DAW", "2DAW" ] },
             { "nombre":"Modo", "tipo":"opciones", "valores":[ "entranamiento", "examen" ] },
-            { "nombre": "Preguntas", "tipo": "especial", "elementos": [{ "tipo": "selección", "valores": ["Texto", "Área"] }, { "tipo": "botón", "texto": "+"}]}
+            { "nombre": "Preguntas", "tipo": "especial", "elementos": [{ "tipo": "selección", "valores": ["--SELECCIONAR","Texto", "Área"] }, { "tipo": "botón", "texto": "+"}]}
         ]}
     }
 

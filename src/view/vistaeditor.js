@@ -8,20 +8,20 @@ export class Editor extends Vista {
         
         // Crear una instancia del modelo con el JSON de ejemplo
         const modelo = new Modelo(); // Pasa el JSON al modelo
-
-        //Obtenemos el JSON utilizando el método getJSON() presente en el modelo
-        const jsonObtenido = modelo.getCabecera();
+        // Obtener ambos JSON del modelo
+        const jsonCabecera = modelo.getCabecera();
+        const jsonPreguntas = modelo.getPregunta();
 
         //Llamamos al método de la vista para generar el formulario dinámicamente
-        if (jsonObtenido) { // Verifica que jsonObtenido esté definido
-            this.generarFormulario(jsonObtenido);
+        if (jsonCabecera && jsonPreguntas) { // Verifica que ambos JSON estén definidos
+            this.generarFormulario(jsonCabecera, jsonPreguntas); // Pasamos ambos JSON a la función
         } else {
-            console.error("No se pudo obtener el JSON."); // Manejo de error si no se obtiene el JSON
+            console.error("No se pudo obtener el JSON."); // Manejo de error si no se obtiene algún JSON
         }
     }
 
     // Generamos el formulario dinámicamente según el JSON proporcionado
-    generarFormulario(jsonObtenido) {
+    generarFormulario(jsonCabecera, jsonPreguntas) {
         // Obtener el contenedor principal
         const container = document.createElement('div');
         container.classList.add('container');
@@ -31,8 +31,8 @@ export class Editor extends Vista {
         titulo.textContent = 'Nuevo JSON';
         container.appendChild(titulo);
 
-        // Iterar sobre los campos del JSON y crear los elementos del formulario
-        jsonObtenido.campos.forEach((campo) => {
+        // Iterar sobre los campos del JSON de la cabecera y crear los elementos del formulario
+        jsonCabecera.campos.forEach((campo) => {
             const formGroup = document.createElement('div');
             formGroup.classList.add('form-group');
 
@@ -94,7 +94,8 @@ export class Editor extends Vista {
                 const addButton = document.createElement('button');
                 addButton.textContent = campo.elementos[1].texto;
                 addButton.addEventListener('click', () => {
-                    //AQUÍ VA LA FUNCIÓN QUE DEBE INTRODUCIR EL NUEVO CÓDIGO 
+                    //AQUÍ VA LA FUNCIÓN QUE DEBE INTRODUCIR EL NUEVO CÓDIGO
+                    this.botonAgregarPregunta(jsonPreguntas); // Pasamos el JSON de preguntas como argumento
                 });
                 formGroup.appendChild(addButton);
             }
@@ -102,6 +103,11 @@ export class Editor extends Vista {
             //Agregar formGroup al contenedor principal
             container.appendChild(formGroup);
         });
+
+        // Crear el contenedor para las preguntas
+        const preguntasContainer = document.createElement('div');
+        preguntasContainer.setAttribute('id', 'preguntasContainer');
+        container.appendChild(preguntasContainer);
 
         // Crear el botón "Generar"
         const buttonGenerar = document.createElement('button');
@@ -116,6 +122,47 @@ export class Editor extends Vista {
         document.body.appendChild(container);
     }
 
+    // Función para añadir una nueva pregunta al formulario
+    botonAgregarPregunta(jsonPreguntas) {
+        // Obtener el tipo de pregunta seleccionado
+        const modalidadSelect = document.getElementById('preguntas').value;
+
+        // Obtener el contenedor donde se agregarán los campos de la nueva pregunta
+        const preguntasContainer = document.getElementById('preguntasContainer');
+
+        // Crear un div para contener los campos de la nueva pregunta
+        const nuevaPreguntaDiv = document.createElement('div');
+        nuevaPreguntaDiv.classList.add('nueva-pregunta');
+
+        // Iterar sobre la configuración de preguntas del modelo
+        jsonPreguntas.preguntas.forEach((preguntaConfig) => {
+            if (preguntaConfig.modalidad === modalidadSelect) {
+                // Crear los campos de la nueva pregunta según la configuración
+                preguntaConfig.campos.forEach((campoConfig) => {
+                    const label = document.createElement('label');
+                    label.textContent = campoConfig.nombre + ':';
+
+                    let inputElement;
+                    if (campoConfig.tipo === 'texto') {
+                        inputElement = document.createElement('input');
+                        inputElement.setAttribute('type', 'text');
+                    } else if (campoConfig.tipo === 'area') {
+                        inputElement = document.createElement('textarea');
+                    } else if (campoConfig.tipo === 'number') {
+                        inputElement = document.createElement('input');
+                        inputElement.setAttribute('type', 'number');
+                    }
+
+                    // Agregar los campos al div de la nueva pregunta
+                    nuevaPreguntaDiv.appendChild(label);
+                    nuevaPreguntaDiv.appendChild(inputElement);
+                });
+            }
+        });
+
+        // Agregar la nueva pregunta al contenedor de preguntas
+        preguntasContainer.appendChild(nuevaPreguntaDiv);
+    }
 
     // Obtener los datos del formulario y devolverlos como un objeto JSON
     obtenerDatosFormulario() {
