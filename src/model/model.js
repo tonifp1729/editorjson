@@ -5,7 +5,7 @@ export class Modelo {
 
     //Devolvemos el JSON
     getCabecera() {
-        return {"campos":[ 
+        return { "campos":[ 
             { "nombre":"Título", "tipo":"texto" },
             { "nombre":"Curso", "tipo":"selección", "valores":[ "--SELECCIONAR", "1DAW", "2DAW" ] },
             { "nombre":"Modo", "tipo":"opciones", "valores":[ "entranamiento", "examen" ] },
@@ -14,9 +14,9 @@ export class Modelo {
     }
 
     getPregunta() {
-        return {"preguntas":[
-            { "modalidad": "Texto", "campos": [{ "nombre": "Pregunta", "tipo": "texto" }, { "nombre": "Respuesta", "tipo": "texto" }, { "nombre": "Puntos", "tipo": "number" }]},
-            { "modalidad": "Área", "campos": [{ "nombre": "Pregunta", "tipo": "texto" }, { "nombre": "Respuesta", "tipo": "area" }, { "nombre": "Puntos", "tipo": "number" }]}
-        ]}
+        return { "preguntas": [
+                { "modalidad": "Texto", "campos": [{ "nombre": "Pregunta", "tipo": "texto" }, { "nombre": "Respuesta", "tipo": "texto" }, { "nombre": "Puntos", "tipo": "number" }], "botonEliminar": true },
+                { "modalidad": "Área", "campos": [{ "nombre": "Pregunta", "tipo": "texto" },{ "nombre": "Respuesta", "tipo": "area" }, { "nombre": "Puntos", "tipo": "number" }], "botonEliminar": true }
+            ]}
     }
 }

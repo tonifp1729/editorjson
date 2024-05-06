@@ -122,47 +122,61 @@ export class Editor extends Vista {
         document.body.appendChild(container);
     }
 
-    // Función para añadir una nueva pregunta al formulario
     botonAgregarPregunta(jsonPreguntas) {
         // Obtener el tipo de pregunta seleccionado
         const modalidadSelect = document.getElementById('preguntas').value;
-
-        // Obtener el contenedor donde se agregarán los campos de la nueva pregunta
-        const preguntasContainer = document.getElementById('preguntasContainer');
-
-        // Crear un div para contener los campos de la nueva pregunta
-        const nuevaPreguntaDiv = document.createElement('div');
-        nuevaPreguntaDiv.classList.add('nueva-pregunta');
-
-        // Iterar sobre la configuración de preguntas del modelo
-        jsonPreguntas.preguntas.forEach((preguntaConfig) => {
-            if (preguntaConfig.modalidad === modalidadSelect) {
-                // Crear los campos de la nueva pregunta según la configuración
-                preguntaConfig.campos.forEach((campoConfig) => {
-                    const label = document.createElement('label');
-                    label.textContent = campoConfig.nombre + ':';
-
-                    let inputElement;
-                    if (campoConfig.tipo === 'texto') {
-                        inputElement = document.createElement('input');
-                        inputElement.setAttribute('type', 'text');
-                    } else if (campoConfig.tipo === 'area') {
-                        inputElement = document.createElement('textarea');
-                    } else if (campoConfig.tipo === 'number') {
-                        inputElement = document.createElement('input');
-                        inputElement.setAttribute('type', 'number');
-                    }
-
-                    // Agregar los campos al div de la nueva pregunta
-                    nuevaPreguntaDiv.appendChild(label);
-                    nuevaPreguntaDiv.appendChild(inputElement);
-                });
-            }
-        });
-
-        // Agregar la nueva pregunta al contenedor de preguntas
-        preguntasContainer.appendChild(nuevaPreguntaDiv);
+    
+        // Verificar si la modalidad seleccionada no es "--SELECCIONAR"
+        if (modalidadSelect !== '--SELECCIONAR') {
+            // Obtener el contenedor donde se agregarán los campos de la nueva pregunta
+            const preguntasContainer = document.getElementById('preguntasContainer');
+    
+            // Crear un div para contener los campos de la nueva pregunta
+            const nuevaPreguntaDiv = document.createElement('div');
+            nuevaPreguntaDiv.classList.add('nueva-pregunta');
+    
+            // Iterar sobre la configuración de preguntas del modelo
+            jsonPreguntas.preguntas.forEach((preguntaConfig) => {
+                if (preguntaConfig.modalidad === modalidadSelect) {
+                    // Crear los campos de la nueva pregunta según la configuración
+                    preguntaConfig.campos.forEach((campoConfig) => {
+                        const label = document.createElement('label');
+                        label.textContent = campoConfig.nombre + ':';
+    
+                        let inputElement;
+                        if (campoConfig.tipo === 'texto') {
+                            inputElement = document.createElement('input');
+                            inputElement.setAttribute('type', 'text');
+                            inputElement.setAttribute('name', campoConfig.nombre.toLowerCase()); // Agregar nombre al campo
+                        } else if (campoConfig.tipo === 'area') {
+                            inputElement = document.createElement('textarea');
+                            inputElement.setAttribute('name', campoConfig.nombre.toLowerCase()); // Agregar nombre al campo
+                        } else if (campoConfig.tipo === 'number') {
+                            inputElement = document.createElement('input');
+                            inputElement.setAttribute('type', 'number');
+                            inputElement.setAttribute('name', campoConfig.nombre.toLowerCase()); // Agregar nombre al campo
+                        }
+    
+                        // Agregar los campos al div de la nueva pregunta
+                        nuevaPreguntaDiv.appendChild(label);
+                        nuevaPreguntaDiv.appendChild(inputElement);
+                    });
+                }
+            });
+    
+            // Crear el botón "-" para eliminar la pregunta
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = '-';
+            deleteButton.addEventListener('click', () => {
+                preguntasContainer.removeChild(nuevaPreguntaDiv); // Eliminar la pregunta al hacer clic en el botón "-"
+            });
+            nuevaPreguntaDiv.appendChild(deleteButton); // Agregar el botón "-" al div de la nueva pregunta
+    
+            // Agregar la nueva pregunta al contenedor de preguntas
+            preguntasContainer.appendChild(nuevaPreguntaDiv);
+        }
     }
+    
 
     // Obtener los datos del formulario y devolverlos como un objeto JSON
     obtenerDatosFormulario() {
@@ -174,13 +188,46 @@ export class Editor extends Vista {
         return JSON.stringify(formData, null, 2);
     }
 
-    botongenerar(nombreFichero, texto) {
-        const a = document.createElement('a')
-        a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(texto))
-        a.setAttribute('download', nombreFichero)
+    botongenerar(nombreFichero) {
+        // Obtener todas las preguntas
+        const preguntas = document.querySelectorAll('.nueva-pregunta');
+    
+        // Array para almacenar los datos de las preguntas
+        const preguntasData = [];
+    
+        // Iterar sobre cada pregunta y obtener sus datos
+        preguntas.forEach((pregunta) => {
+            const preguntaData = {};
+    
+            // Obtener todos los campos de la pregunta
+            const campos = pregunta.querySelectorAll('input, textarea, select');
+    
+            // Iterar sobre cada campo y agregarlo a los datos de la pregunta
+            campos.forEach((campo) => {
+                // Ignorar campos vacíos o que no tienen nombre
+                if (campo.name && campo.value) {
+                    preguntaData[campo.name] = campo.value;
+                }
+            });
+    
+            // Agregar los datos de la pregunta al array de preguntas
+            preguntasData.push(preguntaData);
+        });
+    
+        // Convertir el array de preguntas a formato JSON
+        const jsonPreguntas = JSON.stringify(preguntasData, null, 2);
+    
+        // Crear el enlace de descarga con el JSON de las preguntas
+        const a = document.createElement('a');
+        a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonPreguntas));
+        a.setAttribute('download', nombreFichero);
         a.style.display = 'none';
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-    }
+    
+        // Agregar el enlace al cuerpo del documento y simular un clic para iniciar la descarga
+        document.body.appendChild(a);
+        a.click();
+    
+        // Eliminar el enlace del cuerpo del documento después de la descarga
+        document.body.removeChild(a);
+    }    
 }
