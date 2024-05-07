@@ -189,37 +189,37 @@ export class Editor extends Vista {
     }
 
     botongenerar(nombreFichero) {
+        // Obtener los datos del formulario
+        const formData = {};
+        const formElements = document.querySelectorAll('input, select');
+        formElements.forEach((element) => {
+            formData[element.name] = element.value;
+        });
+    
         // Obtener todas las preguntas
         const preguntas = document.querySelectorAll('.nueva-pregunta');
-    
-        // Array para almacenar los datos de las preguntas
         const preguntasData = [];
-    
-        // Iterar sobre cada pregunta y obtener sus datos
         preguntas.forEach((pregunta) => {
             const preguntaData = {};
-    
-            // Obtener todos los campos de la pregunta
             const campos = pregunta.querySelectorAll('input, textarea, select');
-    
-            // Iterar sobre cada campo y agregarlo a los datos de la pregunta
             campos.forEach((campo) => {
                 // Ignorar campos vacíos o que no tienen nombre
                 if (campo.name && campo.value) {
                     preguntaData[campo.name] = campo.value;
                 }
             });
-    
-            // Agregar los datos de la pregunta al array de preguntas
             preguntasData.push(preguntaData);
         });
     
-        // Convertir el array de preguntas a formato JSON
-        const jsonPreguntas = JSON.stringify(preguntasData, null, 2);
+        // Agregar los datos de las preguntas al formulario
+        formData['preguntas'] = preguntasData;
     
-        // Crear el enlace de descarga con el JSON de las preguntas
+        // Convertir el formulario completo a formato JSON
+        const jsonData = JSON.stringify(formData, null, 2);
+    
+        // Crear el enlace de descarga con el JSON completo
         const a = document.createElement('a');
-        a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonPreguntas));
+        a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonData));
         a.setAttribute('download', nombreFichero);
         a.style.display = 'none';
     
